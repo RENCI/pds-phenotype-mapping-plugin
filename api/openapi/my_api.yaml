@@ -313,7 +313,6 @@ components:
     Config:
       type: object
       required:
-        - piid
         - pluginType
         - supportedPatientVariables
       properties:
