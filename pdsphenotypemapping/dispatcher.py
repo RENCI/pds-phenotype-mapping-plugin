@@ -25,7 +25,7 @@ def add_variable(v):
 
 # Function that returns patient's demographic and clinical feature data
 def lookupClinicalsFromData(patient_id, timestamp, clinical_feature_variables_and_data):
-    clinical_feature_variables = clinical_feature_variables_and_data["patientVariables"]
+    clinical_feature_variables = clinical_feature_variables_and_data["variableTypes"]
     data = clinical_feature_variables_and_data["data"]
     
     mapper = sequence(map(lambda x: lookupClinicalFromRecord(patient_id, data, x, timestamp), clinical_feature_variables))
@@ -42,5 +42,4 @@ def lookupClinicalFromRecord(patient_id, data, v, timestamp):
         return Left((f"cannot find mapping for {clinical}", 400))
     else:
         return filter_data(patient_id, data).bind(lambda records: feature(records, unit, timestamp)).map(add_variable(clinical))
-    
 

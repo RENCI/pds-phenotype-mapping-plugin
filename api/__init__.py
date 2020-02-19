@@ -2,6 +2,9 @@ import pdsphenotypemapping.dispatcher
 import os
 
 def mappingClinicalFromData(patient_id, timestamp, body):
+    if "variableTypes" not in body:
+        body["variableTypes"] = config["supportedPatientVariables"]
+        
     return pdsphenotypemapping.dispatcher.lookupClinicalsFromData(patient_id, timestamp, body)
 
 config = {

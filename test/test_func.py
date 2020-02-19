@@ -369,7 +369,7 @@ def query(pid, cv, unit=None, data=None):
         pv["units"] = unit
     q = {
         "data": data if data is not None else bundles.get(pid, {"resourceType": "Bundle"}),
-        "patientVariables": [pv]
+        "variableTypes": [pv]
     }
     
     return requests.post(f"http://pdsphenotypemapping:8080/mapping?patient_id={pid}&timestamp=2019-10-19T00:00:00Z", headers=json_headers, json=q), pv
@@ -1102,6 +1102,23 @@ config = {
         ]
     ]
 }
+
+
+def test_api_no_variables():
+    pid = "1000"
+    q = {
+        "data": bundles.get(pid)
+    }
+
+    result = requests.post(f"http://pdsphenotypemapping:8080/mapping?patient_id={pid}&timestamp=2019-10-19T00:00:00Z", headers=json_headers, json=q)
+    print(result.content)
+    assert result.status_code == 200
+
+    arr = result.json()
+    assert len(arr) == len(config["supportedPatientVariables"])
+    for var in config["supportedPatientVariables"]:
+        
+        assert len(list(filter(lambda x: x["id"] == var["id"], arr))) == 1
 
 
 def test_config():

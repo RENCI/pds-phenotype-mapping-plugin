@@ -281,66 +281,63 @@ def sex(patient, unit, timestamp):
 
 
 def demographic_extension(url):
-    def func(patient_id, timestamp, plugin):
-        mpatient = get_patient(patient_id, plugin)
-        def calculate_demographic(patient):
-            if patient == None:
-                return {
+    def func(patient, unit, timestamp):
+        if patient == None:
+            return Right({
+                "variableValue": {
+                    "value": None
+                },
+                "certitude": 0,
+                "how": "record not found"            
+            })
+        else:
+            extension = patient.get("extension")
+            if extension is None:
+                return Right({
                     "variableValue": {
                         "value": None
                     },
                     "certitude": 0,
-                    "how": "record not found"            
-                }
+                    "how": "extension not found"
+                })
             else:
-                extension = patient.get("extension")
-                if extension is None:
-                    return {
+                
+                filtered = filter(lambda x: x["url"]==url, extension)
+                if len(filtered) == 0:
+                    return Right({
                         "variableValue": {
                             "value": None
                         },
                         "certitude": 0,
-                        "how": "extension not found"
-                    }
+                        "how": f"extension not found url {url}"
+                    })
                 else:
-                
-                    filtered = filter(lambda x: x["url"]==url, extension)
-                    if len(filtered) == 0:
-                        return {
-                            "variableValue": {
-                                "value": None
-                            },
-                            "certitude": 0,
-                            "how": f"extension not found url {url}"
-                        }
-                    else:
-                        certitude = 2
-                        value = []
-                        calculation = url
-                        hasValueCodeableConcept = True
+                    certitude = 2
+                    value = []
+                    calculation = url
+                    hasValueCodeableConcept = True
+                    
+                    for a in filtered:
+                        valueCodeableConcept = a.get("valueCodeableConcept")
+                        if valueCodeableConcept is None:
+                            certitude = 1
+                            calculation += " valueCodeableConcept not found"
+                        else:
+                            hasValueCodeableConcept = True
+                            value.append(valueCodeableConcept)
+                            
+                    if len(value) == 0:
+                        certitude = 0
+                    elif not hasValueCodeableConcept:
+                        calculation += " on some extension"
 
-                        for a in filtered:
-                            valueCodeableConcept = a.get("valueCodeableConcept")
-                            if valueCodeableConcept is None:
-                                certitude = 1
-                                calculation += " valueCodeableConcept not found"
-                            else:
-                                hasValueCodeableConcept = True
-                                value.append(valueCodeableConcept)
-
-                        if len(value) == 0:
-                            certitude = 0
-                        elif not hasValueCodeableConcept:
-                            calculation += " on some extension"
-
-                        return {
-                            "variableValue": {
-                                "value": value
-                            },
-                            "certitude": certitude,
-                            "how": calculation
-                        }
-        return mpatient.map(calculate_demographic)
+                    return Right({
+                        "variableValue": {
+                            "value": value
+                        },
+                        "certitude": certitude,
+                        "how": calculation
+                    })
     return func
 
 
