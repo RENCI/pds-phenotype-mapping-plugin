@@ -8,7 +8,7 @@ def mappingClinicalFromData(patient_id, timestamp, body):
     return pdsphenotypemapping.dispatcher.lookupClinicalsFromData(patient_id, timestamp, body)
 
 config = {
-    "title": "DOAC variable mapper",
+    "title": "smarthealthit.org variable mapper",
     "pluginType": "m",
     "pluginTypeTitle": "Mapping",
     "pluginSelectors": [],

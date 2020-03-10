@@ -1078,7 +1078,7 @@ def test_api_serum_creatinine_from_data_effectiveDateTime_YYYY_MM_DD():
     }]
 
 config = {
-    "title": "DOAC variable mapper",
+    "title": "smarthealthit.org variable mapper",
     "pluginType": "m",
     "pluginTypeTitle": "Mapping",
     "pluginSelectors": [],
