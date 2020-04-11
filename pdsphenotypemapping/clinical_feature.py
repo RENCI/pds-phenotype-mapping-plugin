@@ -365,7 +365,7 @@ def cough(records, unit, timestamp):
             "is_regex": False
         }
     ], unit, timestamp, "cough", "Condition")
-s
+
 
 def shortness_of_breath(records, unit, timestamp):
     return query_records(records, [
