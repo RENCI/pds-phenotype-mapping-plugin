@@ -338,6 +338,7 @@ def serum_creatinine(records, unit, timestamp): # 3 arguments as input
 	}
     ], unit, timestamp, "serum creatinine", "Observation")
 
+
 def oxygen_content(records, unit, timestamp): # function for newly added feature [Step 2]-- this is the last step!
     return query_records(records, [
 	{
@@ -347,6 +348,7 @@ def oxygen_content(records, unit, timestamp): # function for newly added feature
 	}
     ], unit, timestamp, "oxygen content", "Observation")
 
+
 def pregnancy(records, unit, timestamp):
     return query_records(records, [
         {
@@ -355,6 +357,36 @@ def pregnancy(records, unit, timestamp):
             "is_regex": True
         }
     ], unit, timestamp, "pregnancy", "Condition")
+
+
+def fever(records, unit, timestamp):
+    return query_records(records, [
+        {
+            "system": "http://loinc.org",
+            "code": "45701-0",
+            "is_regex": False
+        }
+    ], unit, timestamp, "fever", "Condition")
+
+
+def cough(records, unit, timestamp):
+    return query_records(records, [
+        {
+            "system": "http://loinc.org",
+            "code": "64145-6",
+            "is_regex": False
+        }
+    ], unit, timestamp, "cough", "Condition")
+
+
+def shortness_of_breath(records, unit, timestamp):
+    return query_records(records, [
+        {
+            "system": "http://loinc.org",
+            "code": "54564-0",
+            "is_regex": False
+        }
+    ], unit, timestamp, "shortness of breath", "Condition")
 
 
 def bleeding(records, unit, timestamp):
@@ -884,4 +916,8 @@ mapping = {
     "LOINC:8302-2": (get_observation, height, "m"),
     "LOINC:29463-7": (get_observation, weight, "kg"),
     "LOINC:39156-5": (get_observation, bmi, "kg/m^2"),
-	"LOINC:59274-1": (get_observation, oxygen_content, "mL/dL") # newly added feature- Oxygen content in Arterial blood by calculation [Step 1], now go to line 341 for step 2
+	"LOINC:59274-1": (get_observation, oxygen_content, "mL/dL"), # newly added feature- Oxygen content in Arterial blood by calculation [Step 1], now go to line 341 for step 2
+    "LOINC:45701-0": (get_condition, fever, None),
+    "LOINC:64145-6": (get_condition, cough, None),
+    "LOINC:54564-0": (get_condition, shortness_of_breath, None)
+}
