@@ -1102,7 +1102,7 @@ config = {
             ("LOINC:54564-0", "Shortness of breath", {"type": "boolean"}),
             ("LOINC:30525-0", "Age", {"type": "integer"}),
             ("LOINC:54134-2", "Race", {"type": "string"}),
-            ("LOINC:21840-4", "Address", {"type": "string"}),
+            ("LOINC:56799-0", "Address", {"type": "string"}),
             ("LOINC:54120-1", "Ethnicity", {"type": "string"}),
             ("LOINC:21840-4", "Sex", {"type": "string"}),
             ("LOINC:8302-2", "Height", {"type": "number"}),
