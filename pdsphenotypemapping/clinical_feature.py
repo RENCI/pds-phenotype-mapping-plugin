@@ -240,7 +240,7 @@ def address(patient, unit, timestamp):
                                                                              country=used_addr_dict['country'])
             return Right({
                 "variableValue": {
-                    "value": address
+                    "value": used_addr_str
                 },
                 "certitude": 2,
                 "how": f"FHIR resource 'Patient' field>'address' = {used_addr_str}"
