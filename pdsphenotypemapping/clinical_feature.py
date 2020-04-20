@@ -203,7 +203,36 @@ def bmi(records, unit, timestamp):
 	        "is_regex": False
 	    }
         ], unit, timestamp, "bmi", "Observation")
-    
+
+
+def address(patient, unit, timestamp):
+    if patient == None:
+        return Right({
+            "variableValue": {
+                "value": None
+            },
+            "certitude": 0,
+            "how": "record not found"
+        })
+    else:
+        address = patient.get("address")
+        if address is None:
+            return Right({
+                "variableValue": {
+                    "value": None
+                },
+                "certitude": 0,
+                "how": "address not set"
+            })
+        else:
+            return Right({
+                "variableValue": {
+                    "value": address
+                },
+                "certitude": 2,
+                "how": f"FHIR resource 'Patient' field>'address' = {address}"
+            })
+
 
 def calculate_age2(born, timestamp):
     try:
@@ -345,6 +374,86 @@ race = demographic_extension("http://hl7.org/fhir/StructureDefinition/us-core-ra
 
 
 ethnicity = demographic_extension("http://hl7.org/fhir/StructureDefinition/us-core-ethnicity")
+
+
+def fever(records, unit, timestamp):
+    return query_records(records, [
+        {
+            "system": "http://loinc.org",
+            "code": "45701-0",
+            "is_regex": False
+        }
+    ], unit, timestamp, "fever", "Condition")
+
+
+def date_of_fever_onset(records, unit, timestamp):
+    return query_records(records, [
+        {
+            "system": "http://loinc.org",
+            "code": "LP212175-6",
+            "is_regex": False
+        }
+    ], unit, timestamp, "date of fever onset", "Condition")
+
+
+def cough(records, unit, timestamp):
+    return query_records(records, [
+        {
+            "system": "http://loinc.org",
+            "code": "64145-6",
+            "is_regex": False
+        }
+    ], unit, timestamp, "cough", "Condition")
+
+
+def date_of_cough_onset(records, unit, timestamp):
+    return query_records(records, [
+        {
+            "system": "http://loinc.org",
+            "code": "85932-2",
+            "is_regex": False
+        }
+    ], unit, timestamp, "date of cough onset", "Condition")
+
+
+def shortness_of_breath(records, unit, timestamp):
+    return query_records(records, [
+        {
+            "system": "http://loinc.org",
+            "code": "54564-0",
+            "is_regex": False
+        }
+    ], unit, timestamp, "shortness of breath", "Condition")
+
+
+def autoimmune_disease(records, unit, timestamp):
+    return query_records(records, [
+        {
+            "system": "http://loinc.org",
+            "code": "LP128504-0",
+            "is_regex": False
+        }
+    ], unit, timestamp, "autoimmune disease", "Condition")
+
+
+def pulmonary_disease(records, unit, timestamp):
+    return query_records(records, [
+        {
+            "system": "http://loinc.org",
+            "code": "54542-6",
+            "is_regex": False
+        }
+    ], unit, timestamp, "pulmonary disease", "Condition")
+
+
+def cardiovascular_disease(records, unit, timestamp):
+    return query_records(records, [
+        {
+            "system": "http://loinc.org",
+            "code": "LP172921-1",
+            "is_regex": False
+        }
+    ], unit, timestamp, "cardiovascular disease", "Condition")
 
 
 def serum_creatinine(records, unit, timestamp):
@@ -884,11 +993,21 @@ mapping = {
     "LOINC:82810-3": (get_condition, pregnancy, None), # pregnancy
     "HP:0001892": (get_condition, bleeding, None), # bleeding
     "HP:0000077": (get_condition, kidney_dysfunction, None), # kidney dysfunction
+    "LOINC:45701-0": (get_condition, fever, None),
+    "LOINC:LP212175-6": (get_condition, date_of_fever_onset, None),
+    "LOINC:64145-6": (get_condition, cough, None),
+    "LOINC:85932-2": (get_condition, date_of_cough_onset, None),
+    "LOINC:54564-0": (get_condition, shortness_of_breath, None),
+    "LOINC:LP128504-0": (get_condition, autoimmune_disease, None),
+    "LOINC:54542-6": (get_condition, pulmonary_disease, None),
+    "LOINC:LP172921-1": (get_condition, cardiovascular_disease, None),
     "LOINC:30525-0": (get_patient, age, "year"),
     "LOINC:54134-2": (get_patient, race, None),
     "LOINC:54120-1": (get_patient, ethnicity, None),
     "LOINC:21840-4": (get_patient, sex, None),
+    "LOINC:56799-0": (get_patient, address, None),
     "LOINC:8302-2": (get_observation, height, "m"),
     "LOINC:29463-7": (get_observation, weight, "kg"),
-    "LOINC:39156-5": (get_observation, bmi, "kg/m^2")
+    "LOINC:39156-5": (get_observation, bmi, "kg/m^2"),
+
 }
