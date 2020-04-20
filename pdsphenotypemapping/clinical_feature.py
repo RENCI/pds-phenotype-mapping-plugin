@@ -225,12 +225,25 @@ def address(patient, unit, timestamp):
                 "how": "address not set"
             })
         else:
+            # use home type address if available, otherwise, just use the first address
+            used_addr_dict = None
+            for addr in address:
+                if addr['use'] == 'home':
+                    used_addr_dict = addr
+                    break
+            if not used_addr_dict:
+                used_addr_dict = address[0]
+            used_addr_str = '{line}, {city}, {state} {pc}, {country}'.format(line=','.join(used_addr_dict['line']),
+                                                                             city=used_addr_dict['city'],
+                                                                             state=used_addr_dict['state'],
+                                                                             pc=used_addr_dict['postalCode'],
+                                                                             country=used_addr_dict['country'])
             return Right({
                 "variableValue": {
                     "value": address
                 },
                 "certitude": 2,
-                "how": f"FHIR resource 'Patient' field>'address' = {address}"
+                "how": f"FHIR resource 'Patient' field>'address' = {used_addr_str}"
             })
 
 
