@@ -30,6 +30,7 @@ config = {
             ("LOINC:LP172921-1", "Cardiovascular disease", {"type": "boolean"}),
             ("LOINC:54542-6", "Pulmonary disease", {"type": "boolean"}),
             ("LOINC:LP128504-0", "Autoimmune disease", {"type": "boolean"}),
+            ("LOINC:LP21258-6", "Oxygen saturation", {"type": "number"}),
             ("LOINC:30525-0", "Age", {"type": "integer"}),
             ("LOINC:54134-2", "Race", {"type": "string"}),
             ("LOINC:54120-1", "Ethnicity", {"type": "string"}),

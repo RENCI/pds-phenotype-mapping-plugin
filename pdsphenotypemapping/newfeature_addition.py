@@ -202,7 +202,17 @@ def bmi(records, unit, timestamp):
 	        "is_regex": False
 	    }
         ], unit, timestamp, "bmi", "Observation")
-    
+
+
+def oxygen_saturation(records, unit, timestamp):
+    return query_records(records, [
+	    {
+	        "system":"http://loinc.org",
+	        "code":"LP21258-6",
+	        "is_regex": False
+	    }
+        ], unit, timestamp, "oxygen saturation", "Observation")
+
 
 def address(records, unit, timestamp):
     return query_records(records, [
@@ -973,11 +983,12 @@ mapping = {
     "LOINC:54134-2": (get_patient, race, None),
     "LOINC:54120-1": (get_patient, ethnicity, None),
     "LOINC:21840-4": (get_patient, sex, None),
-    "LOINC:21840-4": (get_patient, address, None),
+    "LOINC:56799-0": (get_patient, address, None),
     "LOINC:8302-2": (get_observation, height, "m"),
     "LOINC:29463-7": (get_observation, weight, "kg"),
     "LOINC:39156-5": (get_observation, bmi, "kg/m^2"),
 	"LOINC:59274-1": (get_observation, oxygen_content, "mL/dL"), # newly added feature- Oxygen content in Arterial blood by calculation [Step 1], now go to line 341 for step 2
+    "LOINC:LP21258-6": (get_observation, oxygen_saturation, "%"),
     "LOINC:LP128504-0": (get_condition, autoimmune_disease, None),
     "LOINC:54542-6": (get_condition, pulmonary_disease, None),
     "LOINC:LP172921-1": (get_condition, cardiovascular_disease, None),

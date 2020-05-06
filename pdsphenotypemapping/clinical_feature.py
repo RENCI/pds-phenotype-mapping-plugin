@@ -205,6 +205,16 @@ def bmi(records, unit, timestamp):
         ], unit, timestamp, "bmi", "Observation")
 
 
+def oxygen_saturation(records, unit, timestamp):
+    return query_records(records, [
+	    {
+	        "system":"http://loinc.org",
+	        "code":"LP21258-6",
+	        "is_regex": False
+	    }
+        ], unit, timestamp, "oxygen saturation", "Observation")
+
+
 def address(patient, unit, timestamp):
     if patient == None:
         return Right({
@@ -1022,5 +1032,5 @@ mapping = {
     "LOINC:8302-2": (get_observation, height, "m"),
     "LOINC:29463-7": (get_observation, weight, "kg"),
     "LOINC:39156-5": (get_observation, bmi, "kg/m^2"),
-
+    "LOINC:LP21258-6": (get_observation, oxygen_saturation, "%"),
 }
