@@ -271,7 +271,6 @@ components:
       required:
         - id
         - variableValue
-        - certitude
         - how
       properties:
         id:
