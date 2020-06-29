@@ -270,8 +270,9 @@ components:
     Config:
       type: object
       required:
+        - piid
         - pluginType
-        - supportedPatientVariables
+        - settingsDefaults
       properties:
         piid:
           type: string
@@ -370,7 +371,7 @@ components:
       type: object
       required:
         - id
-        - legalValues
+        - how
       description: "The PatientVariable is used to describe required variables, including all the legal values (legalValues) of that variable, and to provide defaults and override values of that variable. The legalValues defines the type for the variableValue, and so the PatientVariable can also be used to inform the client on how to render the variableValue. The 'units' field  is optional, and if left off, implies the system default units."
       properties:
         id:
