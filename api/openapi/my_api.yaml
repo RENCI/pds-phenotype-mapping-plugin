@@ -412,7 +412,3 @@ components:
           example: "years"
     Bundle:
       type: object
-# Added by API Auto Mocking Plugin
-servers:
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/txscience/test/1.0.0
