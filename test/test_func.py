@@ -1128,8 +1128,8 @@ def test_api_no_variables():
     assert result.status_code == 200
 
     arr = result.json()
-    assert len(arr) == len(config["supportedPatientVariables"])
-    for var in config["supportedPatientVariables"]:
+    assert len(arr) == len(config['settingsDefaults']["patientVariables"])
+    for var in config['settingsDefaults']["patientVariables"]:
         
         assert len(list(filter(lambda x: x["id"] == var["id"], arr))) == 1
 
