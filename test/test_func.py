@@ -362,6 +362,7 @@ def query(pid, cv, unit=None, data=None):
         "legalValues": {
             "type": "integer"
         },
+        "how": f"{cv} how",
         "why": f"{cv} why",
         "id": cv,
     }
