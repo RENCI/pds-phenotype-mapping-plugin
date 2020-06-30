@@ -26,7 +26,7 @@ paths:
                     "title": "DOAC variable mapper",
                     "piid": "pdspi-mapper-DOAC",
                     "pluginType": "m",
-                    "settingsDefaults": [
+                    "settingsDefaults": {
                       "pluginSelectors": [ {
                           "title": "FHIR URI - an URL (locator) or an URN (unique name)",
                           "selectorValue": {
@@ -80,7 +80,7 @@ paths:
                           "legalValues": { "type": "number" } 
                         },
                       ]
-                    ]
+                    }
                 }
         '400':
           description: "Bad Request"
