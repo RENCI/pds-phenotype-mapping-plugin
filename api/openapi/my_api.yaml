@@ -665,7 +665,3 @@ components:
           example: "2020-07-01T14:29:15.453Z"
     Bundle:
       type: object
-# Added by API Auto Mocking Plugin
-servers:
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/txscience/pdspi-mapper-example/1.0.0
