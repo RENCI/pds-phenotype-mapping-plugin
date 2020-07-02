@@ -642,11 +642,7 @@ components:
             For example, { type: 'string', 'enum': [ 'Gentamicin', 'Amikacin' ]
             } to define an enumeration,  { 'type': 'number' } for a float, and {
             'type': 'number', 'minimum': '0' } for a positive number, and {
-            'type': 'integer' } for an integer. NOTE: This value is
-            actually an object type, but we use 'string' here to overcome a
-            shortcoming of the swagger ui. This design choice was made in order
-            to prioritize a better interactive documentation experience for the
-            API user. 
+            'type': 'integer' } for an integer.
           example:
             type: number
             minimum: '0'
