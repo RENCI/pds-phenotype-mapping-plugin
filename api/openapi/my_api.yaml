@@ -634,7 +634,7 @@ components:
             Age is used to calculate the creatinine clearance. Dosing is lower
             for geriatric patient and contraindicated for pediatric patients
         legalValues:
-          type: string
+          type: object
           description: >-
             If absent, all values are legal, so treat the value like a string.
             Use the JSON schema,
