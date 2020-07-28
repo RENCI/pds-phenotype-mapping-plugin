@@ -370,7 +370,7 @@ def query(pid, cv, unit=None, data=None):
     q = {
         "patientIds": [pid],
         "timestamp" : "2019 - 10 - 19T00: 00:00Z",
-        "data": data if data is not None else bundles.get(pid, {"resourceType": "Bundle"}),
+        "data": data if data is not None else [bundles.get(pid, {"resourceType": "Bundle"})],
         "settingsRequested": {"patientVariables": [pv]}
     }
     
