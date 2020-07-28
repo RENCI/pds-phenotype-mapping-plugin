@@ -1,11 +1,14 @@
 import pdsphenotypemapping.dispatcher
 
 
-def mappingClinicalFromData(patient_id, timestamp, body):
-    if "variableTypes" not in body:
-        body["variableTypes"] = config['settingsDefaults']["patientVariables"]
-        
-    return pdsphenotypemapping.dispatcher.lookupClinicalsFromData(patient_id, timestamp, body)
+def mappingClinicalFromData(body):
+    if "settingsRequested" not in body:
+        body["settingsRequested"] = config['settingsDefaults']
+    patient_ids = body["patientIds"]
+    timestamp = body["timestamp"]
+    return [{"patientId": patient_id,
+             "values": pdsphenotypemapping.dispatcher.lookupClinicalsFromData(patient_id, i, timestamp, body)
+             } for i, patient_id in enumerate(patient_ids)]
 
 
 config = {

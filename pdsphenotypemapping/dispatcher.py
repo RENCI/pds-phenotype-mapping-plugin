@@ -1,7 +1,3 @@
-import json
-import os
-import re
-import sys
 from oslash import Left, Right
 from .clinical_feature import mapping
 from tx.functional.utils import monad_utils, case, identity
@@ -24,9 +20,9 @@ def add_variable(v):
     
 
 # Function that returns patient's demographic and clinical feature data
-def lookupClinicalsFromData(patient_id, timestamp, clinical_feature_variables_and_data):
-    clinical_feature_variables = clinical_feature_variables_and_data["variableTypes"]
-    data = clinical_feature_variables_and_data["data"]
+def lookupClinicalsFromData(patient_id, patient_id_index, timestamp, clinical_feature_variables_and_data):
+    clinical_feature_variables = clinical_feature_variables_and_data['settingsRequested']["patientVariables"]
+    data = clinical_feature_variables_and_data["data"][patient_id_index]
     
     mapper = sequence(map(lambda x: lookupClinicalFromRecord(patient_id, data, x, timestamp), clinical_feature_variables))
     return case(mapper)(add_status_code)(identity)

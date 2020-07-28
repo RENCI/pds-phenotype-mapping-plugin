@@ -368,11 +368,13 @@ def query(pid, cv, unit=None, data=None):
     if unit is not None:
         pv["units"] = unit
     q = {
+        "patientIds": [pid],
+        "timestamp" : "2019 - 10 - 19T00: 00:00Z",
         "data": data if data is not None else bundles.get(pid, {"resourceType": "Bundle"}),
-        "variableTypes": [pv]
+        "settingsRequested": {"patientVariables": [pv]}
     }
     
-    return requests.post(f"http://pdsphenotypemapping:8080/mapping?patient_id={pid}&timestamp=2019-10-19T00:00:00Z", headers=json_headers, json=q), pv
+    return requests.post(f"http://pdsphenotypemapping:8080/mapping", headers=json_headers, json=q), pv
 
 
 def test_api_age():
@@ -381,13 +383,16 @@ def test_api_age():
     assert result.status_code == 200
                 
     assert result.json() == [{
-        "variableValue": {
-            "value": 10,
-            "units": "year"
-        },
-        "how": "Current date '2019-10-19' minus patient's birthdate (FHIR resource 'Patient' field>'birthDate' = '2009-01-01T00:00:00Z')",
-        "certitude": 2,
-        "id": pvt["id"]
+        "patientId": "1000",
+        "values": [{
+            "variableValue": {
+                "value": 10,
+                "units": "year"
+            },
+            "how": "Current date '2019-10-19' minus patient's birthdate (FHIR resource 'Patient' field>'birthDate' = '2009-01-01T00:00:00Z')",
+            "certitude": 2,
+            "id": pvt["id"]
+        }]
     }]
 
     
@@ -397,14 +402,16 @@ def test_api_age_no_field():
     assert result.status_code == 200
                 
     assert result.json() == [{
-        "variableValue": {
-            "value": None
-        },
-        "how": "birthDate not set",
-        "certitude": 0,
-        "id": pvt["id"]
+        "patientId": "1001",
+        "values": [{
+            "variableValue": {
+                "value": None
+            },
+            "how": "birthDate not set",
+            "certitude": 0,
+            "id": pvt["id"]
+        }]
     }]
-
     
 def test_api_age_no_record():
     result, pvt = query("2000", "LOINC:30525-0")
@@ -412,12 +419,15 @@ def test_api_age_no_record():
     assert result.status_code == 200
                 
     assert result.json() == [{
-        "variableValue": {
-            "value": None
-        },
-        "how": "record not found",
-        "certitude": 0,
-        "id": pvt["id"]
+        "patientId": "2000",
+        "values": [{
+            "variableValue": {
+                "value": None
+            },
+            "how": "record not found",
+            "certitude": 0,
+            "id": pvt["id"]
+        }]
     }]
 
     
@@ -427,15 +437,17 @@ def test_api_age_unit_year():
     assert result.status_code == 200
                 
     assert result.json() == [{
-        "variableValue": {
-            "value": 10,
-            "units": "year"
-        },
-        "how": "Current date '2019-10-19' minus patient's birthdate (FHIR resource 'Patient' field>'birthDate' = '2009-01-01T00:00:00Z')",
-        "certitude": 2,
-        "id": pvt["id"]
+        "patientId": "1000",
+        "values": [{
+            "variableValue": {
+                "value": 10,
+                "units": "year"
+            },
+            "how": "Current date '2019-10-19' minus patient's birthdate (FHIR resource 'Patient' field>'birthDate' = '2009-01-01T00:00:00Z')",
+            "certitude": 2,
+            "id": pvt["id"]
+        }]
     }]
-
     
 def test_api_age_unit_wrong():
     result, pvt = query("1000", "LOINC:30525-0", "wrong")
@@ -451,12 +463,15 @@ def test_api_sex():
     assert result.status_code == 200
                 
     assert result.json() == [{
-        "variableValue": {
-            "value": "male"
-        },
-        "how": "FHIR resource 'Patient' field>'gender' = male",
-        "certitude": 2,
-        "id": pvt["id"]
+        "patientId": "1000",
+        "values": [{
+            "variableValue": {
+                "value": "male"
+            },
+            "how": "FHIR resource 'Patient' field>'gender' = male",
+            "certitude": 2,
+            "id": pvt["id"]
+        }]
     }]
 
     
@@ -466,12 +481,15 @@ def test_api_sex_no_field():
     assert result.status_code == 200
                 
     assert result.json() == [{
-        "variableValue": {
-            "value": None
-        },
-        "how": "gender not set",
-        "certitude": 0,
-        "id": pvt["id"]
+        "patientId": "1001",
+        "values": [{
+            "variableValue": {
+                "value": None
+            },
+            "how": "gender not set",
+            "certitude": 0,
+            "id": pvt["id"]
+        }]
     }]
 
     
@@ -481,12 +499,15 @@ def test_api_sex_no_record():
     assert result.status_code == 200
                 
     assert result.json() == [{
-        "variableValue": {
-            "value": None
-        },
-        "how": "record not found",
-        "certitude": 0,
-        "id": pvt["id"]
+        "patientId": "2000",
+        "values": [{
+            "variableValue": {
+                "value": None
+            },
+            "how": "record not found",
+            "certitude": 0,
+            "id": pvt["id"]
+        }]
     }]
 
     
@@ -496,16 +517,18 @@ def test_api_serum_creatinine():
     assert result.status_code == 200
                 
     assert result.json() == [{
-        "variableValue": {
-            "value": 95,
-            "units": "mg/dL"
-        },
-        "how": "current as of 2019-10-19T00:00:00Z. (Date computed from FHIR resource 'Observation', field>'effectiveInstant' = '2019-10-19T00:00:00Z'); 'serum creatinine' computed from FHIR resource 'Observation' code http://loinc.org 2160-0, field>'valueQuantity'field>'value' = '95', 'unit'>'mg/dL'.",
-        "timestamp": "2019-10-19T00:00:00Z",
-        "certitude": 2,
-        "id": pvt["id"]
+        "patientId": "1000",
+        "values": [{
+            "variableValue": {
+                "value": 95,
+                "units": "mg/dL"
+            },
+            "how": "current as of 2019-10-19T00:00:00Z. (Date computed from FHIR resource 'Observation', field>'effectiveInstant' = '2019-10-19T00:00:00Z'); 'serum creatinine' computed from FHIR resource 'Observation' code http://loinc.org 2160-0, field>'valueQuantity'field>'value' = '95', 'unit'>'mg/dL'.",
+            "timestamp": "2019-10-19T00:00:00Z",
+            "certitude": 2,
+            "id": pvt["id"]
+        }]
     }]
-      
 
 def test_api_serum_creatinine_no_timestamp():
     result, pvt = query("1001", "LOINC:2160-0")
@@ -513,16 +536,18 @@ def test_api_serum_creatinine_no_timestamp():
     assert result.status_code == 200
                 
     assert result.json() == [{
-        "variableValue": {
-            "value": 95,
-            "units": "mg/dL"
-        },
-        "how": "current as of 2019-10-19T00:00:00Z. (record has no timestamp) 'serum creatinine' computed from FHIR resource 'Observation' code http://loinc.org 2160-0, field>'valueQuantity'field>'value' = '95', 'unit'>'mg/dL'.",
-        "timestamp": None,
-        "certitude": 1,
-        "id": pvt["id"]
+        "patientId": "1001",
+        "values": [{
+            "variableValue": {
+                "value": 95,
+                "units": "mg/dL"
+            },
+            "how": "current as of 2019-10-19T00:00:00Z. (record has no timestamp) 'serum creatinine' computed from FHIR resource 'Observation' code http://loinc.org 2160-0, field>'valueQuantity'field>'value' = '95', 'unit'>'mg/dL'.",
+            "timestamp": None,
+            "certitude": 1,
+            "id": pvt["id"]
+        }]
     }]
-
 
 def test_api_serum_creatinine_no_record():
     result, pvt = query("2000", "LOINC:2160-0")
@@ -530,12 +555,15 @@ def test_api_serum_creatinine_no_record():
     assert result.status_code == 200
                 
     assert result.json() == [{
-        "variableValue": {
-            "value": None
-        },
-        "how": "no record found code http://loinc.org 2160-0",
-        "certitude": 0,
-        "id": pvt["id"]
+        "patientId": "2000",
+        "values": [{
+            "variableValue": {
+                "value": None
+            },
+            "how": "no record found code http://loinc.org 2160-0",
+            "certitude": 0,
+            "id": pvt["id"]
+        }]
     }]
 
     
@@ -592,16 +620,18 @@ def test_api_weight():
     assert result.status_code == 200
                 
     assert result.json() == [{
-        "variableValue": {
-            "value": 99.9,
-            "units": "kg"
-        },
-        "how": "current as of 2019-10-19T00:00:00Z. (Date computed from FHIR resource 'Observation', field>'effectiveInstant' = '2019-10-19T00:00:00Z'); 'weight' computed from FHIR resource 'Observation' code http://loinc.org 29463-7, field>'valueQuantity'field>'value' = '99.9', 'unit'>'kg'.",
-        "timestamp": "2019-10-19T00:00:00Z",
-        "certitude": 2,
-        "id": pvt["id"]
+        "patientId": "1000",
+        "values": [{
+            "variableValue": {
+                "value": 99.9,
+                "units": "kg"
+            },
+            "how": "current as of 2019-10-19T00:00:00Z. (Date computed from FHIR resource 'Observation', field>'effectiveInstant' = '2019-10-19T00:00:00Z'); 'weight' computed from FHIR resource 'Observation' code http://loinc.org 29463-7, field>'valueQuantity'field>'value' = '99.9', 'unit'>'kg'.",
+            "timestamp": "2019-10-19T00:00:00Z",
+            "certitude": 2,
+            "id": pvt["id"]
+        }]
     }]
-      
 
 def test_api_weight_no_timestamp():
     result, pvt = query("1001", "LOINC:29463-7")
@@ -609,14 +639,17 @@ def test_api_weight_no_timestamp():
     assert result.status_code == 200
                 
     assert result.json() == [{
-        "variableValue": {
-            "value": 99.9,
-            "units": "kg"
-        },
-        "how": "current as of 2019-10-19T00:00:00Z. (record has no timestamp) 'weight' computed from FHIR resource 'Observation' code http://loinc.org 29463-7, field>'valueQuantity'field>'value' = '99.9', 'unit'>'kg'.",
-        "timestamp": None,
-        "certitude": 1,
-        "id": pvt["id"]
+        "patientId": "1001",
+        "values": [{
+            "variableValue": {
+                "value": 99.9,
+                "units": "kg"
+            },
+            "how": "current as of 2019-10-19T00:00:00Z. (record has no timestamp) 'weight' computed from FHIR resource 'Observation' code http://loinc.org 29463-7, field>'valueQuantity'field>'value' = '99.9', 'unit'>'kg'.",
+            "timestamp": None,
+            "certitude": 1,
+            "id": pvt["id"]
+        }]
     }]
 
 
@@ -626,12 +659,15 @@ def test_api_weight_no_record():
     assert result.status_code == 200
                 
     assert result.json() == [{
-        "variableValue": {
-            "value": None
-        },
-        "how": "no record found code http://loinc.org 29463-7",
-        "certitude": 0,
-        "id": pvt["id"]
+        "patientId": "2000",
+        "values": [{
+            "variableValue": {
+                "value": None
+            },
+            "how": "no record found code http://loinc.org 29463-7",
+            "certitude": 0,
+            "id": pvt["id"]
+        }]
     }]
 
     
@@ -641,14 +677,17 @@ def test_api_weight_unit_kg():
     assert result.status_code == 200
                 
     assert result.json() == [{
-        "variableValue": {
-            "value": 99.9,
-            "units": "kg"
-        },
-        "how": "current as of 2019-10-19T00:00:00Z. (Date computed from FHIR resource 'Observation', field>'effectiveInstant' = '2019-10-19T00:00:00Z'); 'weight' computed from FHIR resource 'Observation' code http://loinc.org 29463-7, field>'valueQuantity'field>'value' = '99.9', 'unit'>'kg'.",
-        "timestamp": "2019-10-19T00:00:00Z",
-        "certitude": 2,
-        "id": pvt["id"]
+        "patientId": "1000",
+        "values": [{
+            "variableValue": {
+                "value": 99.9,
+                "units": "kg"
+            },
+            "how": "current as of 2019-10-19T00:00:00Z. (Date computed from FHIR resource 'Observation', field>'effectiveInstant' = '2019-10-19T00:00:00Z'); 'weight' computed from FHIR resource 'Observation' code http://loinc.org 29463-7, field>'valueQuantity'field>'value' = '99.9', 'unit'>'kg'.",
+            "timestamp": "2019-10-19T00:00:00Z",
+            "certitude": 2,
+            "id": pvt["id"]
+        }]
     }]
 
     
@@ -658,16 +697,18 @@ def test_api_weight_unit_g():
     assert result.status_code == 200
                 
     assert result.json() == [{
-        "variableValue": {
-            "value": 99900,
-            "units": "g"
-        },
-        "how": "current as of 2019-10-19T00:00:00Z. (Date computed from FHIR resource 'Observation', field>'effectiveInstant' = '2019-10-19T00:00:00Z'); 'weight' computed from FHIR resource 'Observation' code http://loinc.org 29463-7, field>'valueQuantity'field>'value' = '99.9', 'unit'>'kg' converted to g.",
-        "timestamp": "2019-10-19T00:00:00Z",
-        "certitude": 2,
-        "id": pvt["id"]
+        "patientId": "1000",
+        "values": [{
+            "variableValue": {
+                "value": 99900,
+                "units": "g"
+            },
+            "how": "current as of 2019-10-19T00:00:00Z. (Date computed from FHIR resource 'Observation', field>'effectiveInstant' = '2019-10-19T00:00:00Z'); 'weight' computed from FHIR resource 'Observation' code http://loinc.org 29463-7, field>'valueQuantity'field>'value' = '99.9', 'unit'>'kg' converted to g.",
+            "timestamp": "2019-10-19T00:00:00Z",
+            "certitude": 2,
+            "id": pvt["id"]
+        }]
     }]
-
     
 def test_api_weight_unit_system_default():
     result, pvt = query("5000", "LOINC:29463-7")
@@ -675,14 +716,17 @@ def test_api_weight_unit_system_default():
     assert result.status_code == 200
                 
     assert result.json() == [{
-        "variableValue": {
-            "value": 99.9,
-            "units": "kg"
-        },
-        "how": "current as of 2019-10-19T00:00:00Z. (Date computed from FHIR resource 'Observation', field>'effectiveInstant' = '2019-10-19T00:00:00Z'); 'weight' computed from FHIR resource 'Observation' code http://loinc.org 29463-7, field>'valueQuantity'field>'value' = '99900', 'unit'>'g' converted to kg.",
-        "timestamp": "2019-10-19T00:00:00Z",
-        "certitude": 2,
-        "id": pvt["id"]
+        "patientId": "5000",
+        "values": [{
+            "variableValue": {
+                "value": 99.9,
+                "units": "kg"
+            },
+            "how": "current as of 2019-10-19T00:00:00Z. (Date computed from FHIR resource 'Observation', field>'effectiveInstant' = '2019-10-19T00:00:00Z'); 'weight' computed from FHIR resource 'Observation' code http://loinc.org 29463-7, field>'valueQuantity'field>'value' = '99900', 'unit'>'g' converted to kg.",
+            "timestamp": "2019-10-19T00:00:00Z",
+            "certitude": 2,
+            "id": pvt["id"]
+        }]
     }]
 
     
@@ -700,13 +744,16 @@ def test_api_bleeding():
     assert result.status_code == 200
                 
     assert result.json() == [{
-        "variableValue": {
-            "value": True
-        },
-        "how": "current as of 2019-10-19T00:00:00Z. (Date computed from FHIR resource 'Condition', field>'onsetDateTime' = '2019-10-19T00:00:00Z'); 'bleeding' computed from FHIR resource 'Condition' code http://hl7.org/fhir/sid/icd-10-cm I60.0011.",
-        "timestamp": "2019-10-19T00:00:00Z",
-        "certitude": 2,
-        "id": pvt["id"]
+        "patientId": "1000",
+        "values": [{
+            "variableValue": {
+                "value": True
+            },
+            "how": "current as of 2019-10-19T00:00:00Z. (Date computed from FHIR resource 'Condition', field>'onsetDateTime' = '2019-10-19T00:00:00Z'); 'bleeding' computed from FHIR resource 'Condition' code http://hl7.org/fhir/sid/icd-10-cm I60.0011.",
+            "timestamp": "2019-10-19T00:00:00Z",
+            "certitude": 2,
+            "id": pvt["id"]
+        }]
     }]
       
 
@@ -716,13 +763,16 @@ def test_api_bleeding_no_timestamp():
     assert result.status_code == 200
                 
     assert result.json() == [{
-        "variableValue": {
-            "value": True
-        },
-        "how": "current as of 2019-10-19T00:00:00Z. (record has no timestamp) 'bleeding' computed from FHIR resource 'Condition' code http://hl7.org/fhir/sid/icd-10-cm I60.0011.",
-        "timestamp": None,
-        "certitude": 1,
-        "id": pvt["id"]
+        "patientId": "1001",
+        "values": [{
+            "variableValue": {
+                "value": True
+            },
+            "how": "current as of 2019-10-19T00:00:00Z. (record has no timestamp) 'bleeding' computed from FHIR resource 'Condition' code http://hl7.org/fhir/sid/icd-10-cm I60.0011.",
+            "timestamp": None,
+            "certitude": 1,
+            "id": pvt["id"]
+        }]
     }]
 
 
@@ -732,263 +782,266 @@ def test_api_bleeding_no_record():
     assert result.status_code == 200
                 
     assert result.json() == [{
-        "variableValue": {
-            "value": None
-        },
-        "how": "no record found code " + ",".join(map(lambda a: a["system"] + " " + a["code"], [
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"I60\\..*",
-                "is_regex":True 
+        "patientId": "2000",
+        "values": [{
+            "variableValue": {
+                "value": None
             },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"I61\\..*",
-                "is_regex":True
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"I62\\..*",
-                "is_regex":True
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"G95.19",
-                "is_regex":False
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"T85.830",
-                "is_regex":False
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H11.3",
-                "is_regex":False
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H31.3",
-                "is_regex":False
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H43.1",
-                "is_regex":False
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H59.1",
-                "is_regex":False
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H59.3",
-                "is_regex":False
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"I85.01",
-                "is_regex":False
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"K22.11",
-                "is_regex":False
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H22.6",
-                "is_regex":False
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H25.0",
-                "is_regex":False
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H25.2",
-                "is_regex":False
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H25.4",
-                "is_regex":False
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H25.6",
-                "is_regex":False
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H26.0",
-                "is_regex":False
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H26.2",
-                "is_regex":False
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H26.4",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H26.6",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H27.0",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H27.2",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H27.4",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H27.6",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H28.0",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H28.2",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H28.4",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"H28.6",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"K29.01",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"K31.811",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"K92.0",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"K55.21",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"K57.01",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"K57.21",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"K57.31",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"K57.33",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"K57.41",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"K57.51",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"K57.53",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"K57.81",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"K57.91",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"K57.93",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"K62.5",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"K92.1",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"K92.2",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"K66.1",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"M25.0",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"I31.2",
-                "is_regex":False,
-            },
-            {
-                "system":"http://hl7.org/fhir/sid/icd-10-cm",
-                "code":"R58\\..*",
-                "is_regex":True,
-            }
-        ])),
-        "certitude": 0,
-        "id": pvt["id"]
+            "how": "no record found code " + ",".join(map(lambda a: a["system"] + " " + a["code"], [
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"I60\\..*",
+                    "is_regex":True
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"I61\\..*",
+                    "is_regex":True
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"I62\\..*",
+                    "is_regex":True
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"G95.19",
+                    "is_regex":False
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"T85.830",
+                    "is_regex":False
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H11.3",
+                    "is_regex":False
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H31.3",
+                    "is_regex":False
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H43.1",
+                    "is_regex":False
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H59.1",
+                    "is_regex":False
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H59.3",
+                    "is_regex":False
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"I85.01",
+                    "is_regex":False
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"K22.11",
+                    "is_regex":False
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H22.6",
+                    "is_regex":False
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H25.0",
+                    "is_regex":False
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H25.2",
+                    "is_regex":False
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H25.4",
+                    "is_regex":False
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H25.6",
+                    "is_regex":False
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H26.0",
+                    "is_regex":False
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H26.2",
+                    "is_regex":False
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H26.4",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H26.6",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H27.0",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H27.2",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H27.4",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H27.6",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H28.0",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H28.2",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H28.4",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"H28.6",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"K29.01",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"K31.811",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"K92.0",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"K55.21",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"K57.01",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"K57.21",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"K57.31",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"K57.33",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"K57.41",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"K57.51",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"K57.53",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"K57.81",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"K57.91",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"K57.93",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"K62.5",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"K92.1",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"K92.2",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"K66.1",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"M25.0",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"I31.2",
+                    "is_regex":False,
+                },
+                {
+                    "system":"http://hl7.org/fhir/sid/icd-10-cm",
+                    "code":"R58\\..*",
+                    "is_regex":True,
+                }
+            ])),
+            "certitude": 0,
+            "id": pvt["id"]
+        }]
     }]
 
 
@@ -1024,14 +1077,17 @@ def test_api_serum_creatinine_from_data_effectiveDateTime():
     assert result.status_code == 200
                 
     assert result.json() == [{
-        "variableValue": {
-            "value": 95,
-            "units": "mg/dL"
-        },
-        "how": "current as of 2019-10-19T00:00:00Z. (Date computed from FHIR resource 'Observation', field>'effectiveDateTime' = '2019-10-19T00:00:00Z'); 'serum creatinine' computed from FHIR resource 'Observation' code http://loinc.org 2160-0, field>'valueQuantity'field>'value' = '95', 'unit'>'mg/dL'.",
-        "timestamp": "2019-10-19T00:00:00Z",
-        "certitude": 2,
-        "id": pvt["id"]
+        "patientId": "1000",
+        "values": [{
+            "variableValue": {
+                "value": 95,
+                "units": "mg/dL"
+            },
+            "how": "current as of 2019-10-19T00:00:00Z. (Date computed from FHIR resource 'Observation', field>'effectiveDateTime' = '2019-10-19T00:00:00Z'); 'serum creatinine' computed from FHIR resource 'Observation' code http://loinc.org 2160-0, field>'valueQuantity'field>'value' = '95', 'unit'>'mg/dL'.",
+            "timestamp": "2019-10-19T00:00:00Z",
+            "certitude": 2,
+            "id": pvt["id"]
+        }]
     }]
 
     
@@ -1067,14 +1123,17 @@ def test_api_serum_creatinine_from_data_effectiveDateTime_YYYY_MM_DD():
     assert result.status_code == 200
                 
     assert result.json() == [{
-        "variableValue": {
-            "value": 95,
-            "units": "mg/dL"
-        },
-        "how": "current as of 2019-10-19T00:00:00Z. (Date computed from FHIR resource 'Observation', field>'effectiveDateTime' = '2019-10-19'); 'serum creatinine' computed from FHIR resource 'Observation' code http://loinc.org 2160-0, field>'valueQuantity'field>'value' = '95', 'unit'>'mg/dL'.",
-        "timestamp": "2019-10-19",
-        "certitude": 2,
-        "id": pvt["id"]
+        "patientId": "1000",
+        "values": [{
+            "variableValue": {
+                "value": 95,
+                "units": "mg/dL"
+            },
+            "how": "current as of 2019-10-19T00:00:00Z. (Date computed from FHIR resource 'Observation', field>'effectiveDateTime' = '2019-10-19'); 'serum creatinine' computed from FHIR resource 'Observation' code http://loinc.org 2160-0, field>'valueQuantity'field>'value' = '95', 'unit'>'mg/dL'.",
+            "timestamp": "2019-10-19",
+            "certitude": 2,
+            "id": pvt["id"]
+        }]
     }]
 
 config = {
@@ -1120,18 +1179,21 @@ config = {
 def test_api_no_variables():
     pid = "1000"
     q = {
+        "patientIds": [pid],
+        "timestamp" : "2019-10-19T00:00:00Z",
         "data": bundles.get(pid)
     }
 
-    result = requests.post(f"http://pdsphenotypemapping:8080/mapping?patient_id={pid}&timestamp=2019-10-19T00:00:00Z", headers=json_headers, json=q)
+    result = requests.post(f"http://pdsphenotypemapping:8080/mapping", headers=json_headers, json=q)
     print(result.content)
     assert result.status_code == 200
 
     arr = result.json()
-    assert len(arr) == len(config['settingsDefaults']["patientVariables"])
+    assert len(arr) == 1
+    sub_arr = arr[0]["values"]
+    assert len(sub_arr) == len(config['settingsDefaults']["patientVariables"])
     for var in config['settingsDefaults']["patientVariables"]:
-        
-        assert len(list(filter(lambda x: x["id"] == var["id"], arr))) == 1
+        assert len(list(filter(lambda x: x["id"] == var["id"], sub_arr))) == 1
 
 
 def test_config():

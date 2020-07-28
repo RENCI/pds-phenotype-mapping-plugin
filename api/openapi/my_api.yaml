@@ -126,26 +126,16 @@ paths:
     post:
       summary: map from patient record to clinical feature variables
       operationId: api.mappingClinicalFromData
-      parameters:
-        - in: query
-          name: patient_id
-          example: 38
-          schema:
-            type: string
-          required: true
-        - in: query
-          name: timestamp
-          schema:
-            type: string
-            format: date-time
-          required: true
+      parameters: []
       requestBody:
         content:
           application/json:
             schema:
-              description: "Send in FHIR bundle containing as much data as needed to map the values requested in 'variableTypes'. For example, to provide clinical guidance, the bundle should contain the entire patient record. To provide mappings for a study period, the record will only cover the duration of the study. To create a feature vector for a training set, the duration might be only 24 hours, and the mapper might be called repeatedly for the same patient across multiple days to create a standardized array."
+              description: "Send in array of bundles, one per patient id containing as much data as needed to map the values requested. For example, to provide clinical guidance, the bundle should contain the entire patient record. To provide mappings for a study period, the record will only cover the duration of the study. To create a feature vector for a training set, the duration might be only 24 hours, and the mapper might be called repeatedly for the same patient across multiple days to create a standardized array."
               type: object
               required:
+                - patientIds
+                - timestamp
                 - data
               properties:
                 txid:
@@ -153,27 +143,39 @@ paths:
                 timeout:
                   type: integer
                   description: "Number of milliseconds until time out. Factory system default should be 120000 (2 minutes) for RUO applictions, and only 500ms for clinical."
-                data:
-                  $ref: "#/components/schemas/Bundle"
-                variableTypes:
-                  description: "If absent, all variables will be mapped and returned."
+                patientIds:
+                  description: "Map these patient ids from the FHIR"
+                  example: [38]
                   type: array
                   items:
-                    $ref: "#/components/schemas/PatientVariable"
+                    type: string
+                data:
+                  description: "An array of FHIR bundles, one per patient id of type 'batch-response'."
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Bundle"
+                timestamp:
+                  type: string
+                  format: date-time
+                settingsRequested:
+                  description: "If absent, all variables will be mapped and returned."
+                  $ref: "#/components/schemas/Settings"
       responses:
         '200':
           description: Successful operation
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  txid:
-                    type: string
-                  values:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/PatientVariable"
+                type: array
+                items:
+                  type: object
+                  properties:
+                    patientId:
+                      type: string
+                    values:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/PatientVariable"
         '400':
           description: "Bad Request"
           content:
