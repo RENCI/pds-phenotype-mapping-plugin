@@ -6,9 +6,19 @@ def mappingClinicalFromData(body):
         body["settingsRequested"] = config['settingsDefaults']
     patient_ids = body["patientIds"]
     timestamp = body["timestamp"]
-    return [{"patientId": patient_id,
-             "values": pdsphenotypemapping.dispatcher.lookupClinicalsFromData(patient_id, i, timestamp, body)
-             } for i, patient_id in enumerate(patient_ids)]
+
+    ret_response = []
+    for i, patient_id in enumerate(patient_ids):
+        val = pdsphenotypemapping.dispatcher.lookupClinicalsFromData(patient_id, i, timestamp, body)
+        if isinstance(val, tuple):
+            # mapping failed since a (error_message, status_code) tuple is returned
+            return val
+        else:
+            ret_response.append({
+                "patientId": patient_id,
+                "values": val
+            })
+    return ret_response
 
 
 config = {

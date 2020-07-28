@@ -451,9 +451,9 @@ def test_api_age_unit_year():
     
 def test_api_age_unit_wrong():
     result, pvt = query("1000", "LOINC:30525-0", "wrong")
-    print(result.content)
+    print(result.content, flush=True)
     assert result.status_code == 400
-                
+
     assert result.json() == "unsupported unit wrong"
 
     
@@ -1046,7 +1046,7 @@ def test_api_bleeding_no_record():
 
 
 def test_api_serum_creatinine_from_data_effectiveDateTime():
-    result, pvt = query("1000", "LOINC:2160-0", data={
+    result, pvt = query("1000", "LOINC:2160-0", data=[{
         "resourceType": "Bundle",
         "entry": [{
             "resource": {
@@ -1072,7 +1072,7 @@ def test_api_serum_creatinine_from_data_effectiveDateTime():
                 }
             }
         }]
-    })
+    }])
     print(result.content)
     assert result.status_code == 200
                 
@@ -1092,7 +1092,7 @@ def test_api_serum_creatinine_from_data_effectiveDateTime():
 
     
 def test_api_serum_creatinine_from_data_effectiveDateTime_YYYY_MM_DD():
-    result, pvt = query("1000", "LOINC:2160-0", data={
+    result, pvt = query("1000", "LOINC:2160-0", data=[{
         "resourceType": "Bundle",
         "entry": [{
             "resource": {
@@ -1118,7 +1118,7 @@ def test_api_serum_creatinine_from_data_effectiveDateTime_YYYY_MM_DD():
                 }
             }
         }]
-    })
+    }])
     print(result.content)
     assert result.status_code == 200
                 
@@ -1181,7 +1181,7 @@ def test_api_no_variables():
     q = {
         "patientIds": [pid],
         "timestamp" : "2019-10-19T00:00:00Z",
-        "data": bundles.get(pid)
+        "data": [bundles.get(pid)]
     }
 
     result = requests.post(f"http://pdsphenotypemapping:8080/mapping", headers=json_headers, json=q)
