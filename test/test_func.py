@@ -81,6 +81,7 @@ import requests
 bundles = {
     "1000": {
         "resourceType": "Bundle",
+        "type": "collection",
         "entry": [{
             "resource": {
                 "resourceType": "Patient",
@@ -175,6 +176,7 @@ bundles = {
     },
     "1001": {
         "resourceType": "Bundle",
+        "type": "collection",
         "entry": [{
             "resource": {
                 "resourceType": "Patient",
@@ -241,6 +243,7 @@ bundles = {
     },
     "3000": {
         "resourceType": "Bundle",
+        "type": "collection",
         "entry": [{
             "resource": {
                 "resourceType": "Observation",
@@ -259,6 +262,7 @@ bundles = {
     },
     "3001": {
         "resourceType": "Bundle",
+        "type": "collection",
         "entry": [{
             "resource": {
                 "resourceType": "Observation",
@@ -279,6 +283,7 @@ bundles = {
     },
     "5000": {
         "resourceType": "Bundle",
+        "type": "collection",
         "entry": [{
             "resource": {
                 "resourceType": "Observation",
