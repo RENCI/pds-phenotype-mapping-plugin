@@ -3,7 +3,7 @@ from tx.dateutils.utils import tstostr, strtots, strtodate
 from datetime import datetime, date
 import os
 import re
-from oslash import Left, Right
+from tx.functional.either import Left, Right
 from tx.pint.utils import convert
 
 

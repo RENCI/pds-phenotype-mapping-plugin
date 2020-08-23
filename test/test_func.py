@@ -375,7 +375,7 @@ def query(pid, cv, unit=None, data=None):
     q = {
         "patientIds": [pid],
         "timestamp" : "2019-10-19T00:00:00Z",
-        "data": data if data is not None else [bundles.get(pid, {"resourceType": "Bundle"})],
+        "data": data if data is not None else [bundles.get(pid, {"resourceType": "Bundle", "type": "collection"})],
         "settingsRequested": {"patientVariables": [pv]}
     }
     
@@ -1053,6 +1053,7 @@ def test_api_bleeding_no_record():
 def test_api_serum_creatinine_from_data_effectiveDateTime():
     result, pvt = query("1000", "LOINC:2160-0", data=[{
         "resourceType": "Bundle",
+        "type": "collection",
         "entry": [{
             "resource": {
                 "resourceType": "Observation",
@@ -1099,6 +1100,7 @@ def test_api_serum_creatinine_from_data_effectiveDateTime():
 def test_api_serum_creatinine_from_data_effectiveDateTime_YYYY_MM_DD():
     result, pvt = query("1000", "LOINC:2160-0", data=[{
         "resourceType": "Bundle",
+        "type": "collection",
         "entry": [{
             "resource": {
                 "resourceType": "Observation",

@@ -1,6 +1,6 @@
-from oslash import Left, Right
+from tx.functional.either import Left, Right
 from .clinical_feature import mapping
-from tx.functional.utils import monad_utils, case, identity
+from tx.functional.utils import monad_utils, identity
 
 m = monad_utils(Right)
 
@@ -25,7 +25,7 @@ def lookupClinicalsFromData(patient_id, patient_id_index, timestamp, clinical_fe
     data = clinical_feature_variables_and_data["data"][patient_id_index]
     
     mapper = sequence(map(lambda x: lookupClinicalFromRecord(patient_id, data, x, timestamp), clinical_feature_variables))
-    return case(mapper)(add_status_code)(identity)
+    return mapper.rec(add_status_code, identity)
 
 
 def lookupClinicalFromRecord(patient_id, data, v, timestamp):
